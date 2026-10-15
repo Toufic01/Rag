@@ -1,6 +1,3 @@
-"""
-rag_system.py  -  the WHOLE RAG pipeline in ONE file
-"""
 import re
 import sys
 import time
@@ -12,16 +9,15 @@ from docx import Document
 from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 
-# ======================================================================
-# 2. SETTINGS
-# ======================================================================
+# SETTINGS
+
 EMBED_MODEL = "all-MiniLM-L6-v2"
 LLM_MODEL = "llama3.2"
 CHUNK_STRATEGY = "fixed"
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 100
 TOP_K = 3
-MAX_DISTANCE = 0.75                  # Slightly more forgiving default
+MAX_DISTANCE = 0.75
 SUPPORTED = (".pdf", ".docx", ".txt")
 NOT_FOUND = "I could not find this in the uploaded documents."
 
@@ -31,9 +27,8 @@ SYSTEM_PROMPT = (
     "Be concise. Cite the passages you used like [1], [2]."
 )
 
-# ======================================================================
-# 3. SETUP OBJECTS
-# ======================================================================
+#SETUP OBJECTS
+
 embedder = SentenceTransformer(EMBED_MODEL)
 client = chromadb.PersistentClient(path="chroma_db")
 collection = client.get_or_create_collection(
@@ -41,9 +36,8 @@ collection = client.get_or_create_collection(
     metadata={"hnsw:space": "cosine"},
 )
 
-# ======================================================================
-# 4. STEP 1 - PARSERS
-# ======================================================================
+#STEP 1 - PARSERS
+
 def clean(text: str) -> str:
     text = re.sub(r"[ \t]+", " ", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
@@ -82,9 +76,9 @@ def load_file(path):
         raise ValueError(f"No text found in {Path(path).name} (scanned PDF or empty file?)")
     return segments
 
-# ======================================================================
-# 5. STEP 2 - CHUNKING
-# ======================================================================
+
+# STEP 2 - CHUNKING
+
 def chunk_fixed(text: str, size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP) -> list[str]:
     if not 0 <= overlap < size:
         raise ValueError("overlap must be >= 0 and smaller than size")
@@ -117,9 +111,9 @@ def chunk_text(text, strategy=CHUNK_STRATEGY, size=CHUNK_SIZE, overlap=CHUNK_OVE
         return chunk_sentences(text, size, overlap)
     raise ValueError("strategy must be 'fixed' or 'sentence'")
 
-# ======================================================================
-# 6. STEP 3 - INGEST
-# ======================================================================
+
+# STEP 3 - INGEST
+
 def ingest(path, strategy=CHUNK_STRATEGY, size=CHUNK_SIZE, overlap=CHUNK_OVERLAP, col=None) -> int:
     col = col or collection
     name = Path(path).name
@@ -146,9 +140,9 @@ def ingest_folder(folder="data", **kwargs) -> dict:
             results[p.name] = ingest(p, **kwargs)
     return results
 
-# ======================================================================
-# 7. STEP 4 - RETRIEVE
-# ======================================================================
+
+# STEP 4 - RETRIEVE
+
 def embed_question(question: str):
     if "bge" in EMBED_MODEL.lower():
         question = "Represent this sentence for searching relevant passages: " + question
@@ -166,9 +160,9 @@ def retrieve(question: str, k: int = TOP_K, max_distance: float = MAX_DISTANCE, 
                      "chunk": meta["chunk"], "distance": dist})
     return [h for h in hits if h["distance"] <= max_distance]
 
-# ======================================================================
-# 8. STEP 5 - ASK
-# ======================================================================
+
+# STEP 5 - ASK
+
 def ask(question: str, k: int = TOP_K, max_distance: float = MAX_DISTANCE):
     start = time.time()
     hits = retrieve(question, k, max_distance)
@@ -199,9 +193,9 @@ def ask(question: str, k: int = TOP_K, max_distance: float = MAX_DISTANCE):
         hits = []
     return answer, hits, time.time() - start
 
-# ======================================================================
-# 9. COMMAND LINE
-# ======================================================================
+
+# COMMAND LINE
+
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         sys.exit(__doc__)

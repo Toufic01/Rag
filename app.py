@@ -1,6 +1,3 @@
-"""
-app.py  -  the web page (Streamlit). Run with:   streamlit run app.py
-"""
 from pathlib import Path
 import streamlit as st
 import rag_system as rag
@@ -9,7 +6,7 @@ st.set_page_config(page_title="Local Document Q&A", page_icon="📄")
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-# ---------------------------------------------------------------- sidebar
+# sidebar
 with st.sidebar:
     st.header("Settings")
     top_k = st.slider("Passages to retrieve (top-k)", 1, 8, rag.TOP_K)
@@ -45,7 +42,7 @@ with st.sidebar:
             rag.collection.delete(ids=ids)
         st.rerun()
 
-# ------------------------------------------------------------------- main
+# main
 st.title("📄 Local Document Q&A")
 st.caption("Everything runs on your computer: sentence-transformers + ChromaDB + Ollama")
 

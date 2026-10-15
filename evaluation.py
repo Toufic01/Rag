@@ -1,12 +1,4 @@
-"""
-evaluation.py  -  measure how good the system is.
 
-    python evaluation.py            -> compare 2 embedding models x 4 chunking setups (no LLM needed)
-    python evaluation.py answers    -> ask all questions end to end, check "not found", measure latency (needs Ollama)
-
-Questions + the expected source/keyword are in questions.json.
-A retrieved chunk counts as CORRECT if it comes from the expected file AND contains an expected keyword.
-"""
 import csv
 import json
 import sys
@@ -34,7 +26,7 @@ def is_correct(text, source, q):
     return source in q["sources"] and any(norm(k) in norm(text) for k in q["keywords"])
 
 
-# ----------------------------------------------------------------- 1) retrieval comparison
+#  1 retrieval comparison
 def compare_retrieval():
     files = [p for p in sorted(Path("data").iterdir()) if p.suffix.lower() in rag.SUPPORTED]
     db = chromadb.EphemeralClient()               # temporary database in memory (does not touch chroma_db/)
@@ -67,7 +59,7 @@ def compare_retrieval():
                 times.append(time.time() - t)
                 top1 = res["distances"][0][0]
                 if not q["answerable"]:
-                    unans_dist.append(top1)       # distance of the best match for a question that has NO answer
+                    unans_dist.append(top1)
                     continue
                 ans_dist.append(top1)
                 ranks = [i for i, (d, m) in enumerate(zip(res["documents"][0], res["metadatas"][0]), 1)
@@ -94,7 +86,7 @@ def compare_retrieval():
     print("\nTip: set MAX_DISTANCE in rag_system.py between dist_answerable and dist_unanswerable of your best setup.")
 
 
-# ----------------------------------------------------------------- 2) end-to-end answers + latency
+# 2 end-to-end answers + latency
 def evaluate_answers():
     print("Indexing sample documents with the settings from rag_system.py ...")
     rag.ingest_folder("data")
