@@ -1,0 +1,19 @@
+AI Basics: A Short Guide to Retrieval-Augmented Generation
+
+What is RAG?
+Retrieval-Augmented Generation (RAG) combines a retriever with a language model. The retriever searches a document collection for passages related to the user's question. These passages are given to the language model as context, so it can write an answer grounded in real documents instead of relying only on its training data. The RAG approach was introduced in 2020 by researchers at Facebook AI Research.
+
+Chunking
+Chunking means splitting long documents into smaller pieces before they are indexed. Small chunks give more precise retrieval, while large chunks keep more context. Overlap between neighbouring chunks helps avoid cutting an important sentence in half. Sentence-based chunking keeps whole sentences together, while fixed-size chunking cuts text after a set number of characters.
+
+Embeddings
+An embedding is a list of numbers that represents the meaning of a text. Texts with similar meaning have embeddings that are close together. The model all-MiniLM-L6-v2 produces embeddings with 384 dimensions and is very fast. The model bge-small-en-v1.5 also produces 384 dimensions and often retrieves more accurately.
+
+Vector databases
+A vector database stores embeddings and quickly finds the nearest ones to a query. Popular open-source choices are FAISS and Chroma. FAISS was created by Meta, while Chroma is designed to be simple to use for small applications and stores data on disk.
+
+Running models locally
+Ollama is a tool that runs open-source language models on your own computer, so no document is sent to an external service. The llama3.2 model is available in a 3 billion parameter version and a smaller 1 billion parameter version for computers with limited memory.
+
+Hallucination
+A language model hallucinates when it states something that is not supported by its sources. In a RAG system, hallucinations can be reduced by telling the model to answer only from the retrieved context, by using a low temperature, and by refusing to answer when no relevant passage is found.
