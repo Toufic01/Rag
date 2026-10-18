@@ -212,17 +212,6 @@ Test questions live in `questions.json`: some are answerable from `data/`, and s
 
 Full analysis, answer-quality results and latency are in **[REPORT.md](REPORT.md)**.
 
----
-
-## 🖼️ Screenshots
-
-| | |
-|---|---|
-| ![Home](docs/screenshots/01_home.png) <br> *Four-step interface* | ![Indexed](docs/screenshots/02_indexed.png) <br> *Files indexed, settings applied* |
-| ![Answer](docs/screenshots/03_answer_sources.png) <br> *Answer with sources* | ![Not found](docs/screenshots/04_not_found.png) <br> *Question not in the documents* |
-
----
-
 ## ⚠️ Limitations
 
 - **Scanned PDFs** (images of text) are not supported, because there is no OCR step.
